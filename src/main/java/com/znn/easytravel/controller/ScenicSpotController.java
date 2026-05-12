@@ -1,5 +1,6 @@
 package com.znn.easytravel.controller;
 
+import com.znn.easytravel.dto.LocationInfoDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import com.znn.easytravel.response.ScenicSpotVO;
@@ -17,5 +18,10 @@ public class ScenicSpotController {
     @GetMapping("/top-rated")
     public List<ScenicSpotVO> getTopRatedScenicSpots(@RequestParam String cityName) {
         return scenicSpotService.getTopRatedScenicSpots(cityName);
+    }
+
+    @PostMapping("/top-hotel")
+    public List<ScenicSpotVO> getTopRatedHotel(@RequestBody List<LocationInfoDTO> points) {
+        return scenicSpotService.arithmeticAverage(points);
     }
 }
