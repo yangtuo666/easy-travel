@@ -7,18 +7,25 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🗺️ 城市景点推荐</h1>
-            <p>输入城市名称，探索热门景点</p>
-        </div>
+    <div class="page-container">
+        <div class="container">
+            <div class="header">
+                <h1>🗺️ 城市景点推荐</h1>
+                <p>输入城市名称，探索热门景点</p>
+            </div>
 
-        <div class="search-box">
-            <input type="text" id="cityInput" placeholder="请输入城市名称，如：北京、上海、杭州" onkeypress="handleKeyPress(event)">
-            <button onclick="searchSpots()">搜索</button>
-        </div>
+            <div class="search-box">
+                <input type="text" id="cityInput" placeholder="请输入城市名称，如：北京、上海、杭州" onkeypress="handleKeyPress(event)">
+                <button onclick="searchSpots()">搜索</button>
+            </div>
 
-        <div id="resultContainer"></div>
+            <div id="resultContainer"></div>
+        </div>
+    </div>
+
+    <div class="selection-bar" id="selectionBar">
+        <span class="selection-count" id="selectionCount">已选择 0 个景点</span>
+        <button onclick="searchHotels()">查询所选景点中心点附近酒店</button>
     </div>
 
     <script src="/js/app.js"></script>

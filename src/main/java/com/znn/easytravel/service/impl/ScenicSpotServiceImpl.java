@@ -32,8 +32,8 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
     private static final String TYPES2 = "100104|100105|100000";
     private static final boolean CITY_LIMIT = true;
     private static final String SHOW_FIELDS = "business";
-    private static final int MAX_PAGE_NUM = 100; // 防止无限循环，设置最大页数限制
-
+    private static final int MAX_PAGE_NUM = 50; // 防止无限循环，设置最大页数限制
+    private static final int MAX_CHAIN_PAGE_NUM = 2; // 最大链页数
     private final RestTemplate restTemplate;
 
     public ScenicSpotServiceImpl(RestTemplate restTemplate) {
@@ -124,13 +124,14 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
     }
 
     private String buildAroundUrl(String localtion, int pageNum) {
-        return String.format("%s?key=%s&location=%s&types=%s&radius=%s&show_fields=%s&page_num=%d",
+        return String.format("%s?key=%s&location=%s&types=%s&radius=%s&show_fields=%s&sortrule=%s&page_num=%d",
                 GAODE_AROUND_API_URL,
                 API_KEY,
                 localtion,
                 TYPES2,
                 30000,
                 SHOW_FIELDS,
+                "distance",
                 pageNum);
     }
 
@@ -171,6 +172,16 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
                         return false;
                     }
                 })
+                .collect(Collectors.toList());
+    }
+
+    private List<ScenicSpotVO> getTopChain(List<GaoDeResponse.Poi> pois) {
+        //不用任何排序 返回前20条数据
+        return pois.stream()
+                .limit(20)
+                .sorted(Comparator.comparingDouble((GaoDeResponse.Poi poi) ->
+                        Double.parseDouble(poi.getBusiness().getRating())).reversed())
+                .map(this::convertToVO)
                 .collect(Collectors.toList());
     }
 
@@ -217,7 +228,7 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
         int pageNum = 1;
         int maxRetries = 3;
 
-        while (pageNum <= MAX_PAGE_NUM) {
+        while (pageNum <= MAX_CHAIN_PAGE_NUM) {
             log.info("正在获取第 {} 页数据", pageNum);
 
             String url = buildAroundUrl(location, pageNum);
@@ -253,13 +264,13 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
                         return getTopFiveScenicSpots(allQualifiedPois);
                     }
 
-                    List<GaoDeResponse.Poi> currentPagePois = parsePois(poisArray);
+                    List<GaoDeResponse.Poi> qualifiedPois = parsePois(poisArray);
 
-                    List<GaoDeResponse.Poi> qualifiedPois = filterByRating(currentPagePois, 4);
+                    //List<GaoDeResponse.Poi> qualifiedPois = filterByRating(currentPagePois, 4);
                     allQualifiedPois.addAll(qualifiedPois);
 
-                    log.info("第 {} 页获取到 {} 条数据，其中 {} 条符合条件",
-                            pageNum, currentPagePois.size(), qualifiedPois.size());
+                    //log.info("第 {} 页获取到 {} 条数据，其中 {} 条符合条件",
+                            //pageNum, currentPagePois.size(), qualifiedPois.size());
 
                     success = true;
 
@@ -280,7 +291,7 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
 
         log.info("总共获取到 {} 条符合条件的景区数据", allQualifiedPois.size());
 
-        return getTopFiveScenicSpots(allQualifiedPois);
+        return getTopChain(allQualifiedPois);
     }
 
 }

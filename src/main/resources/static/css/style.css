@@ -95,11 +95,35 @@ body {
     padding: 20px;
     transition: all 0.3s ease;
     cursor: pointer;
+    border: 3px solid transparent;
+    position: relative;
 }
 
 .spot-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.spot-card.selected {
+    border-color: #667eea;
+    background: #f0f3ff;
+}
+
+.spot-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background: #667eea;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 .spot-name {
@@ -151,6 +175,55 @@ body {
     color: #e53e3e;
     border-radius: 12px;
     margin-top: 20px;
+}
+
+.selection-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 15px 20px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    z-index: 1000;
+}
+
+.selection-bar.active {
+    display: flex;
+}
+
+.selection-count {
+    color: #333;
+    font-size: 1em;
+}
+
+.selection-bar button {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.selection-bar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.page-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px 80px;
 }
 
 .empty-msg {
