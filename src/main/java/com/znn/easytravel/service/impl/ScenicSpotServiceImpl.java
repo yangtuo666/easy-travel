@@ -29,11 +29,11 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
     @Value("${gao.de.key}")
     private  String API_KEY;
     private static final String TYPES = "110200|110201|110202|110203";
-    private static final String TYPES2 = "100104|100105|100000";
+    private static final String TYPES2 = "100100|100104|100105";
     private static final boolean CITY_LIMIT = true;
     private static final String SHOW_FIELDS = "business";
     private static final int MAX_PAGE_NUM = 50; // 防止无限循环，设置最大页数限制
-    private static final int MAX_CHAIN_PAGE_NUM = 2; // 最大链页数
+    private static final int MAX_CHAIN_PAGE_NUM = 2; // 获取附近酒店的最大页数限制
     private final RestTemplate restTemplate;
 
     public ScenicSpotServiceImpl(RestTemplate restTemplate) {
@@ -176,20 +176,37 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
     }
 
     private List<ScenicSpotVO> getTopChain(List<GaoDeResponse.Poi> pois) {
-        //不用任何排序 返回前20条数据
         return pois.stream()
                 .limit(20)
-                .sorted(Comparator.comparingDouble((GaoDeResponse.Poi poi) ->
-                        Double.parseDouble(poi.getBusiness().getRating())).reversed())
+                .sorted(Comparator.comparingDouble((GaoDeResponse.Poi poi) -> {
+                    if (poi.getBusiness() == null || poi.getBusiness().getRating() == null
+                            || poi.getBusiness().getRating().isEmpty()) {
+                        return -1; // 空值排最后
+                    }
+                    try {
+                        return Double.parseDouble(poi.getBusiness().getRating());
+                    } catch (NumberFormatException e) {
+                        return -1; // 解析失败也排最后
+                    }
+                }).reversed())
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
     }
 
     private List<ScenicSpotVO> getTopFiveScenicSpots(List<GaoDeResponse.Poi> pois) {
         return pois.stream()
-                .sorted(Comparator.comparingDouble((GaoDeResponse.Poi poi) ->
-                        Double.parseDouble(poi.getBusiness().getRating())).reversed())
-                .limit(10)
+                .sorted(Comparator.comparingDouble((GaoDeResponse.Poi poi) -> {
+                    if (poi.getBusiness() == null || poi.getBusiness().getRating() == null
+                            || poi.getBusiness().getRating().isEmpty()) {
+                        return -1; // 空值排最后
+                    }
+                    try {
+                        return Double.parseDouble(poi.getBusiness().getRating());
+                    } catch (NumberFormatException e) {
+                        return -1; // 解析失败也排最后
+                    }
+                }).reversed())
+                .limit(20)
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
     }
@@ -223,7 +240,7 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
 
         double centerLatitude = Math.round((totalLat / points.size()) * 1_000_000.0) / 1_000_000.0;
         double centerLongitude = Math.round((totalLng / points.size()) * 1_000_000.0) / 1_000_000.0;
-        String location = centerLatitude + "," + centerLongitude;
+        String location = centerLongitude + "," + centerLatitude;
         List<GaoDeResponse.Poi> allQualifiedPois = new ArrayList<>();
         int pageNum = 1;
         int maxRetries = 3;

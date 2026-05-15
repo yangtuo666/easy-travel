@@ -101,7 +101,7 @@ function searchHotels() {
         return { longitude: lng, latitude: lat };
     });
 
-    const hotelWindow = window.open('hotel.html', '_blank');
+    sessionStorage.setItem('spotData', JSON.stringify(selectedSpots));
 
     fetch('/api/scenic-spots/top-hotel', {
         method: 'POST',
@@ -117,8 +117,8 @@ function searchHotels() {
             return response.json();
         })
         .then(data => {
-            hotelWindow.hotelData = data;
-            hotelWindow.showHotels();
+            sessionStorage.setItem('hotelData', JSON.stringify(data));
+            window.open('hotel.html', '_blank');
         })
         .catch(error => {
             console.error('Error:', error);
