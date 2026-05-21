@@ -29,7 +29,7 @@ public class ScenicSpotServiceImpl implements ScenicSpotService {
     @Value("${gao.de.key}")
     private  String API_KEY;
     private static final String TYPES = "110200|110201|110202|110203";
-    private static final String TYPES2 = "100100|100104|100105";
+    private static final String TYPES2 = "100104|100105";
     private static final boolean CITY_LIMIT = true;
     private static final String SHOW_FIELDS = "business";
     private static final int MAX_PAGE_NUM = 50; // 防止无限循环，设置最大页数限制
