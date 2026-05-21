@@ -1,5 +1,5 @@
 # 阶段一：使用 Maven 镜像进行项目构建
-FROM maven:3.8.1-jdk-8-slim as builder
+FROM maven:3.8.1-openjdk-17-slim as builder
 # 解决容器时区与真实时间相差8小时的问题
 RUN ln -snf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo Asia/Shanghai > /etc/timezone
 WORKDIR /app
