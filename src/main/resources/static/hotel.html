@@ -142,7 +142,7 @@
 <body>
     <div class="header">
         <h1>🏨 酒店推荐地图</h1>
-        <a href="index.html" class="back-btn">← 返回景点页面</a>
+        <button class="back-btn" onclick="window.close()">← 返回景点页面</button>
     </div>
 
     <div class="map-container" id="mapContainer">
@@ -169,6 +169,7 @@
         let hotelMarkers = [];
         let spotData = [];
         let hotelData = [];
+        let currentInfoWindow = null;
 
         function initMap() {
             try {
@@ -191,6 +192,13 @@
                 map.on('complete', function() {
                     document.getElementById('loading').style.display = 'none';
                     loadDataFromStorage();
+                });
+
+                map.on('click', function(e) {
+                    if (currentInfoWindow) {
+                        currentInfoWindow.close();
+                        currentInfoWindow = null;
+                    }
                 });
 
                 map.on('error', function(e) {
@@ -294,7 +302,11 @@
                     });
 
                     marker.on('click', function() {
+                        if (currentInfoWindow) {
+                            currentInfoWindow.close();
+                        }
                         infoWindow.open(map, marker.getPosition());
+                        currentInfoWindow = infoWindow;
                     });
 
                     map.add(marker);
@@ -325,7 +337,11 @@
                     });
 
                     marker.on('click', function() {
+                        if (currentInfoWindow) {
+                            currentInfoWindow.close();
+                        }
                         infoWindow.open(map, marker.getPosition());
+                        currentInfoWindow = infoWindow;
                     });
 
                     map.add(marker);
